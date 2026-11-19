@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: nexus-itsm
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: NEXUS_DEMO
+        value: 'false'
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: COOKIE_SECURE
+        value: 'true'
+      - key: EMAIL_ENABLED
+        value: 'false'

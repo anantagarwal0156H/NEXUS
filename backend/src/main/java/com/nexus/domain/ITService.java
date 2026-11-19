@@ -1,0 +1,2 @@
+package com.nexus.domain; import jakarta.persistence.*; import java.util.*;
+@Entity @Table(name="it_services") public class ITService{@Id @GeneratedValue(strategy=GenerationType.IDENTITY) public Long id; @Column(nullable=false,unique=true) public String name; public int criticality; @ElementCollection(fetch=FetchType.EAGER) @CollectionTable(name="service_dependencies",joinColumns=@JoinColumn(name="dependent_id")) @Column(name="provider_id") public Set<Long> providers=new HashSet<>(); protected ITService(){} public ITService(String n,int c){name=n;criticality=c;}}

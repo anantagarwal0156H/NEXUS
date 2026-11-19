@@ -1,0 +1,7 @@
+# Demo (15–20 minutes, all four members)
+
+1. Employee logs in, opens Report Incident, chooses Payment gateway / APPLICATION, enters a title and description, impact 3 and urgency 3. Preview P1, submit, note incident ID and assigned technician. Open notifications and timeline.
+2. Log in as assigned technician (default first skill strategy normally Alex Morgan / tech@nexus.demo). Open assigned incident, acknowledge, start, request information/add private note, resolve with actual resolution text. Employee logs in, replies if requested, verifies/rates and closes. Confirm private note is absent in employee view. Try invalid role via direct API in testing (not merely hidden button).
+3. Employee reports two closely worded incidents for same service/category; inspect duplicate warning; admin links related records. Report another service depending on common provider. Admin explores topology, suspected causes, Decision Inspector, Sankey, heatmap, workload and SLA risk. To test escalation, admin changes default P1 response to 1 minute (resolution >= response) before creating a new P1; leave it unacknowledged while app stays running; verify breach/escalation once in audit and both notification channels. Restore policy afterward. Replay actual audit events in Time Machine; clearly explain v1 limitations.
+
+Suggested presenters: employee journey/research; Java lifecycle and Strategy; Java SLA/Observer/database; administrator visualization/QA and limitations. Do not claim passing tests or deployment that haven't been verified.

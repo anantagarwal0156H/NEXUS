@@ -1,0 +1,10 @@
+package com.nexus.security;
+import com.nexus.data.AccountRepository; import org.springframework.context.annotation.*; import org.springframework.security.config.annotation.web.builders.HttpSecurity; import org.springframework.security.web.SecurityFilterChain; import org.springframework.security.web.context.*; import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; import org.springframework.security.crypto.password.PasswordEncoder; import org.springframework.security.core.userdetails.*; import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository; import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+@Configuration public class SecurityConfig {
+ @Bean PasswordEncoder encoder(){return new BCryptPasswordEncoder();}
+ @Bean UserDetailsService users(AccountRepository repo){return username->repo.findByEmail(username).map(a->User.withUsername(a.email).password(a.passwordHash).roles(a.role().name()).disabled(!a.enabled).build()).orElseThrow(()->new UsernameNotFoundException("Invalid credentials"));}
+ @Bean SecurityContextRepository securityRepository(){return new HttpSessionSecurityContextRepository();}
+ @Bean SecurityFilterChain chain(HttpSecurity http,SecurityContextRepository contexts)throws Exception{
+  http.securityContext(c->c.securityContextRepository(contexts)).csrf(c->c.csrfTokenRepository(new HttpSessionCsrfTokenRepository())).authorizeHttpRequests(a->a.requestMatchers("/","/index.html","/assets/**","/favicon.svg","/health","/api/auth/csrf","/api/auth/login","/api/auth/register").permitAll().requestMatchers("/api/admin/**").hasRole("ADMINISTRATOR").anyRequest().authenticated()).exceptionHandling(e->e.authenticationEntryPoint((req,res,x)->res.sendError(401)).accessDeniedHandler((req,res,x)->res.sendError(403))).logout(l->l.logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout","POST")).logoutSuccessHandler((req,res,a)->res.setStatus(204)).deleteCookies("JSESSIONID"));return http.build();
+ }
+}

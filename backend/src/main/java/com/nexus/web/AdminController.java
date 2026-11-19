@@ -1,0 +1,27 @@
+package com.nexus.web;
+import com.nexus.service.*;import com.nexus.domain.*;import com.nexus.domain.Rules.*;import com.nexus.data.*;import jakarta.validation.Valid;import jakarta.validation.constraints.*;import org.springframework.web.bind.annotation.*;import org.springframework.transaction.annotation.Transactional;import java.security.Principal;import java.util.*;
+@RestController @RequestMapping("/api/admin") @Transactional public class AdminController{
+ private final Accounts accounts;private final IncidentService svc;private final Infrastructure infra;private final NoticeRepository notices;
+ public AdminController(Accounts a,IncidentService s,Infrastructure i,NoticeRepository n){accounts=a;svc=s;infra=i;notices=n;}
+ private Account admin(Principal p){Account a=accounts.current(p.getName());accounts.require(a,Role.ADMINISTRATOR);return a;}
+ public record NewUser(@NotBlank @Size(max=100) String name,@Email @NotBlank String email,@NotBlank @Size(min=10,max=72) String password,@NotNull Role role){}
+ public record UserEdit(Boolean enabled,Boolean available,@Min(1) @Max(100) Integer capacity,Map<String,Integer> skills){}
+ public record NewCategory(@NotBlank @Size(max=80) String name){}
+ public record ServiceInput(@NotBlank @Size(max=100) String name,@Min(1) @Max(3) int criticality,Set<Long> providers){}
+ public record PolicyInput(Long serviceId,@NotNull Priority priority,@Min(1) @Max(10080) int responseMinutes,@Min(1) @Max(100800) int resolutionMinutes,@Min(1) @Max(10080) int warningMinutes){}
+ @GetMapping("/users") public List<Map<String,Object>> users(Principal p){admin(p);var all=svc.incidents().findAll();return accounts.repo.findAll().stream().map(a->{var m=Views.user(a);m.put("workload",all.stream().filter(i->i.status().active()&&i.technician!=null&&a.id.equals(i.technician.id)).count());return m;}).toList();}
+ @PostMapping("/users") public Map<String,Object> createUser(Principal p,@Valid @RequestBody NewUser r){admin(p);return Views.user(accounts.register(r.name(),r.email(),r.password(),r.role()));}
+ @PutMapping("/users/{id}") public Map<String,Object> edit(Principal p,@PathVariable long id,@Valid @RequestBody UserEdit r){Account actor=admin(p);Account a=accounts.get(id);if(r.enabled()!=null){if(actor.id.equals(id)&&!r.enabled())throw new IllegalArgumentException("Cannot disable your own account");a.enabled=r.enabled();}if(a instanceof Technician t){if(r.available()!=null)t.available=r.available();if(r.capacity()!=null)t.capacity=r.capacity();if(r.skills()!=null){Set<String> valid=new HashSet<>();svc.categories().findAll().forEach(c->valid.add(c.name));for(var e:r.skills().entrySet())if(!valid.contains(e.getKey())||e.getValue()==null||e.getValue()<1||e.getValue()>5)throw new IllegalArgumentException("Skills must use configured category and level 1–5");t.skills.clear();t.skills.putAll(r.skills());}}return Views.user(a);}
+ @PostMapping("/categories") public Category category(Principal p,@Valid @RequestBody NewCategory r){admin(p);return svc.categories().save(new Category(r.name().trim().toUpperCase(Locale.ROOT)));}
+ @PostMapping("/services") public Map<String,Object> service(Principal p,@Valid @RequestBody ServiceInput r){admin(p);ITService s=svc.services().save(new ITService(r.name().trim(),r.criticality()));providers(s,r.providers());return Views.service(s);}
+ @PutMapping("/services/{id}") public Map<String,Object> editService(Principal p,@PathVariable long id,@Valid @RequestBody ServiceInput r){admin(p);ITService s=svc.service(id);s.name=r.name().trim();s.criticality=r.criticality();providers(s,r.providers());return Views.service(s);}
+ private void providers(ITService s,Set<Long> list){if(list==null)return;for(Long id:list){if(s.id.equals(id))throw new IllegalArgumentException("No self dependencies");svc.service(id);}s.providers.clear();s.providers.addAll(list);}
+ @GetMapping("/policies") public List<SlaPolicy> policies(Principal p){admin(p);return svc.policies().findAll();}
+ @PutMapping("/policies") public SlaPolicy policy(Principal p,@Valid @RequestBody PolicyInput r){admin(p);if(r.serviceId()!=null)svc.service(r.serviceId());return svc.policies().save(new SlaPolicy(r.serviceId(),r.priority(),new Target(r.responseMinutes(),r.resolutionMinutes(),r.warningMinutes())));}
+ @GetMapping("/strategy") public Map<String,String> strategy(Principal p){admin(p);return Map.of("strategy",svc.strategy());}
+ @PutMapping("/strategy") public Map<String,String> strategy(Principal p,@RequestBody Map<String,String> r){admin(p);String strategy=r.get("strategy");if(strategy==null||!Set.of("SKILL","LOAD").contains(strategy))throw new IllegalArgumentException("Unknown strategy");svc.settings().save(new Setting("assignment",strategy));return Map.of("strategy",strategy);}
+ @GetMapping("/decision/{id}") public Object decision(Principal p,@PathVariable long id,@RequestParam(defaultValue="SKILL") String strategy){admin(p);Incident i=svc.get(id);return svc.decision(i.category,strategy,id);}
+ @GetMapping("/graph") public Map<String,Object> graph(Principal p){admin(p);return infra.graph();}
+ @GetMapping("/audit") public List<Audit> audit(Principal p){admin(p);return svc.audit().findAll().stream().sorted(Comparator.comparing((Audit a)->a.at).thenComparing(a->a.id).reversed()).toList();}
+ @GetMapping("/outbox") public List<Notice> outbox(Principal p){admin(p);return notices.findAll().stream().filter(n->n.channel.equals("EMAIL")).sorted(Comparator.comparing((Notice n)->n.id).reversed()).toList();}
+}

@@ -1,0 +1,2 @@
+package com.nexus.service; import com.nexus.data.IncidentRepository; import org.springframework.stereotype.Component; import org.springframework.scheduling.annotation.Scheduled;
+@Component public class SlaMonitor{private final IncidentRepository repo;private final IncidentService service;public SlaMonitor(IncidentRepository r,IncidentService s){repo=r;service=s;}@Scheduled(initialDelay=15000,fixedDelay=30000) public void check(){for(var i:repo.findAll())if(i.status().active())service.monitor(i.id);}}

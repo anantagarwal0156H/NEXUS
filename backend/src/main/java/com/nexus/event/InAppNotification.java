@@ -1,0 +1,2 @@
+package com.nexus.event; import org.springframework.stereotype.Component; import com.nexus.data.NoticeRepository; import com.nexus.domain.Notice;
+@Component public class InAppNotification implements NotificationChannel{private final NoticeRepository repo;public InAppNotification(NoticeRepository r){repo=r;}public void deliver(IncidentEvent e,Long u){repo.save(new Notice(u,e.incidentId(),e.at(),"IN_APP","DELIVERED",e.action()+" · INC-"+e.incidentId()));}}

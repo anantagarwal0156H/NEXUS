@@ -1,0 +1,34 @@
+PASS P1 max
+PASS P1 boundary
+PASS P2
+PASS P3
+PASS P4
+PASS Invalid impact
+PASS Invalid urgency
+PASS Invalid criticality
+PASS Skill selects senior
+PASS Load selects junior
+PASS Three excluded
+PASS Unavailable excluded
+PASS No skill excluded
+PASS At capacity excluded
+PASS No eligible
+PASS Empty candidate list
+PASS All forward lifecycle steps
+PASS Reject NEW to CLOSED
+PASS Reject CLOSED to NEW
+PASS Explicit reopen
+PASS SLA before warning
+PASS SLA warning boundary
+PASS SLA deadline
+PASS SLA completed on time
+PASS SLA late completion
+PASS P1 SLA defaults
+PASS Invalid SLA target
+PASS Similar reports
+PASS Unrelated reports
+PASS Empty words similarity
+PASS Case folded similarity
+PASS Cycle safe graph
+PASS Disconnected graph
+33 checks passed

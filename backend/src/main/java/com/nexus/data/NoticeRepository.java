@@ -1,0 +1,1 @@
+package com.nexus.data; import com.nexus.domain.*; import org.springframework.data.jpa.repository.JpaRepository; public interface NoticeRepository extends JpaRepository<Notice,Long>{java.util.List<Notice> findByRecipientIdOrderByIdDesc(Long recipientId); java.util.List<Notice> findTop30ByDeliveryOrderByIdAsc(String delivery);}

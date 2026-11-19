@@ -1,0 +1,17 @@
+import com.nexus.domain.Rules;
+import com.nexus.domain.Rules.*;
+import com.nexus.strategy.*;
+import java.time.*;
+import java.util.*;
+/** Runs without Maven: javac + java only. */
+public class CoreChecks {
+ static int passed; static void check(String name,boolean value){if(!value)throw new AssertionError(name);System.out.println("PASS "+name);passed++;}
+ static void rejects(String name,Runnable r){try{r.run();throw new AssertionError(name+" did not reject");}catch(IllegalArgumentException|Rules.InvalidTransition expected){check(name,true);}}
+ public static void main(String[] args){
+ check("P1 max",Rules.priority(3,3,3)==Priority.P1);check("P1 boundary",Rules.priority(3,3,2)==Priority.P1);check("P2",Rules.priority(3,3,1)==Priority.P2);check("P3",Rules.priority(2,2,2)==Priority.P3);check("P4",Rules.priority(1,1,3)==Priority.P4);rejects("Invalid impact",()->Rules.score(0,2,2));rejects("Invalid urgency",()->Rules.score(2,4,2));rejects("Invalid criticality",()->Rules.score(2,2,-1));
+ var candidates=List.of(new AssignmentStrategy.Candidate(1,"Senior",5,3,5,true),new AssignmentStrategy.Candidate(2,"Junior",3,0,5,true),new AssignmentStrategy.Candidate(3,"Unavailable",5,0,5,false),new AssignmentStrategy.Candidate(4,"No skill",0,0,5,true),new AssignmentStrategy.Candidate(5,"At capacity",5,5,5,true));var skill=new SkillBasedAssignment().decide(candidates);var load=new LoadBasedAssignment().decide(candidates);check("Skill selects senior",skill.selected()==1);check("Load selects junior",load.selected()==2);check("Three excluded",skill.excluded().size()==3);check("Unavailable excluded",skill.excluded().stream().anyMatch(c->c.id()==3));check("No skill excluded",skill.excluded().stream().anyMatch(c->c.id()==4));check("At capacity excluded",skill.excluded().stream().anyMatch(c->c.id()==5));check("No eligible",new SkillBasedAssignment().decide(List.of(candidates.get(2))).selected()==null);check("Empty candidate list",new LoadBasedAssignment().decide(List.of()).selected()==null);
+ for(int i=0;i<Status.values().length-1;i++)Rules.transition(Status.values()[i],Status.values()[i+1]);check("All forward lifecycle steps",true);rejects("Reject NEW to CLOSED",()->Rules.transition(Status.NEW,Status.CLOSED));rejects("Reject CLOSED to NEW",()->Rules.transition(Status.CLOSED,Status.NEW));Rules.transition(Status.RESOLVED,Status.IN_PROGRESS);check("Explicit reopen",true);
+ Instant due=Instant.parse("2026-01-01T12:00:00Z");check("SLA before warning",Rules.sla(due.minusSeconds(121),due,null,2)==Sla.OK);check("SLA warning boundary",Rules.sla(due.minusSeconds(120),due,null,2)==Sla.WARNING);check("SLA deadline",Rules.sla(due,due,null,2)==Sla.BREACHED);check("SLA completed on time",Rules.sla(due.plusSeconds(5),due,due,2)==Sla.MET);check("SLA late completion",Rules.sla(due.plusSeconds(20),due,due.plusSeconds(10),2)==Sla.BREACHED);check("P1 SLA defaults",Rules.defaultTarget(Priority.P1).equals(new Target(5,30,2)));rejects("Invalid SLA target",()->new Target(10,2,1));
+ check("Similar reports",Rules.duplicate("payment application is unavailable","payment application unavailable"));check("Unrelated reports",!Rules.duplicate("email password","printer broken"));check("Empty words similarity",Rules.similarity("the","a")==0);check("Case folded similarity",Rules.similarity("DATABASE FAIL","database fail")==1);var g=Map.of(1L,Set.of(2L),2L,Set.of(3L),3L,Set.of(1L));check("Cycle safe graph",Rules.reachable(g,1).equals(Set.of(2L,3L)));check("Disconnected graph",Rules.reachable(g,4).isEmpty());System.out.println(passed+" checks passed");
+ }
+}
