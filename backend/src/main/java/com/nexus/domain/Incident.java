@@ -13,6 +13,8 @@ public class Incident {
  @Column(length=8000) public String resolution; @Column(length=2000) public String feedback; public Integer rating;
  public boolean responseWarning,resolutionWarning,responseBreach,resolutionBreach,escalated;
  @Column(length=16000) public String assignmentEvidence;
+ @Column(length=40) public String locationCode;
+ @Column(length=100) public String locationNote;
  @ElementCollection(fetch=FetchType.EAGER) @CollectionTable(name="incident_relations",joinColumns=@JoinColumn(name="incident_id")) @Column(name="related_id") public java.util.Set<Long> related=new java.util.HashSet<>();
  protected Incident(){}
  public Incident(String title,String description,Account reporter,ITService service,Category category,int impact,int urgency,Instant now,Target t){this.title=title;this.description=description;this.reporter=reporter;this.service=service;this.category=category;this.impact=impact;this.urgency=urgency;criticality=service.criticality;priority=Rules.priority(impact,urgency,criticality);createdAt=now;responseDue=now.plusSeconds(t.responseMinutes()*60L);resolutionDue=now.plusSeconds(t.resolutionMinutes()*60L);warningMinutes=t.warningMinutes();}

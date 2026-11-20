@@ -807,3 +807,10 @@ button {
     display:flex;
     gap:8px;
 }
+
+/* Remove mascot throughout NEXUS */
+.nexus-mascot,
+img[src*="panda"],
+img[src*="mascot"] {
+    display: none !important;
+}

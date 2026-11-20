@@ -21,3 +21,8 @@ node_modules/
 target/
 dist/
 .DS_Store
+
+.nexus-v*-backup/
+.nexus-v5-backup/
+
+.nexus-v6-backup/

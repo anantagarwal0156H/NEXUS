@@ -4,6 +4,7 @@ import {
     Inbox, CheckCircle2, Timer, Activity, Shield
 } from 'lucide-react';
 import {api} from './api';
+import {CampusMap,CampusActivity,LocationPicker,SmartAssist} from './campus';
 
 const closed = i =>
     ['RESOLVED','VERIFIED','CLOSED'].includes(i.status);
@@ -15,9 +16,7 @@ const ticket = i =>
     'INC-' + String(i.id).padStart(4,'0');
 
 export function Mascot({size=100}) {
-    return <img className="nexus-mascot"
-        src="/mascot.svg" alt="" aria-hidden="true"
-        style={{width:size,height:'auto'}}/>;
+    return ;
 }
 
 function TicketRows({rows,open,Pill}) {
@@ -33,7 +32,7 @@ function TicketRows({rows,open,Pill}) {
             </button>
         )}
         {!rows.length && <div className="v2-empty">
-            <Mascot size={85}/>
+            
             <p>Nothing to show here yet.</p>
         </div>}
     </div>;
@@ -77,7 +76,7 @@ export function OverviewV2({user,go,open,ui}) {
                     </button>
                 </div>
 
-                <Mascot size={235}/>
+                
             </section>
 
             <div className="employee-shortcuts">
@@ -116,7 +115,7 @@ export function OverviewV2({user,go,open,ui}) {
             </Panel>
 
             <div className="support-tip">
-                <Mascot size={70}/>
+                
                 <div>
                     <b>Not sure what the problem is?</b>
                     <p>That's okay. You don't need to be an IT expert
@@ -183,7 +182,7 @@ export function OverviewV2({user,go,open,ui}) {
                         )}
 
                         {!current.length && <div className="v2-empty">
-                            <Mascot size={100}/>
+                            
                             <p>Your queue is clear.</p>
                         </div>}
                     </div>
@@ -220,7 +219,7 @@ export function OverviewV2({user,go,open,ui}) {
                             Open investigation <ArrowRight size={17}/>
                         </button>
                     </> : <div className="v2-empty">
-                        <Mascot size={120}/>
+                        
                         <p>Select an incident to begin.</p>
                     </div>}
                 </Panel>
@@ -309,6 +308,7 @@ export function OverviewV2({user,go,open,ui}) {
             )}
         </div>
 
+        <div className="campus-command"><Panel title="Campus operations map" sub="Incident locations · selected buildings"><CampusMap incidents={all} open={open} useData={useData}/></Panel><Panel title="Operations pulse" sub="Refreshes every 12 seconds"><CampusActivity useData={useData} open={open}/></Panel></div>
         <div className="admin-main-grid">
 
             <div>
@@ -432,6 +432,7 @@ export function ReportV2({open,ui}) {
     const [f,F] = useState({
         serviceId:'',
         categoryId:'',
+        locationCode:'',locationNote:'',
         title:'',
         description:'',
         impact:1,
@@ -520,7 +521,7 @@ export function ReportV2({open,ui}) {
                 <div className="report-form">
 
                     {step===0 && <>
-                        <h2>What isn't working?</h2>
+                        <h2>What isn't working?</h2><LocationPicker sites={c.locations||[]} value={f.locationCode} note={f.locationNote} put={put}/>
                         <p>Choose the service you're having trouble with.</p>
 
                         <div className="report-services">
@@ -537,7 +538,7 @@ export function ReportV2({open,ui}) {
                     </>}
 
                     {step===1 && <>
-                        <h2>Tell us what happened.</h2>
+                        <h2>Tell us what happened.</h2><SmartAssist categories={c.categories} apply={(s)=>F(old=>({...old,categoryId:c.categories.find(x=>x.name===s.category)?.id||old.categoryId,description:s.description}))}/>
 
                         <label>What kind of problem is it?</label>
 
@@ -602,6 +603,7 @@ export function ReportV2({open,ui}) {
                             <h3>{f.title}</h3>
                             <p>{f.description}</p>
                             <hr/>
+                            <p>Location: {(c.locations||[]).find(x=>x.code===f.locationCode)?.name||"Remote / not specified"} {f.locationNote}</p>
                             <p>Service: {
                                 c.services.find(s=>s.id===f.serviceId)?.name
                             }</p>
@@ -641,7 +643,7 @@ export function ReportV2({open,ui}) {
             </section>
 
             <aside className="report-companion">
-                <Mascot size={160}/>
+                
                 <h3>I'm here to help.</h3>
                 <p>{
                     [
