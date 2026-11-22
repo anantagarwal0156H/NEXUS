@@ -1,3 +1,7 @@
+# Test evidence — historical run
+
+> **Version notice (22 November 2026):** The results below describe standalone Java checks recorded during an earlier development iteration. They do **not** establish that the latest V6.1 Glass Operations release or its Render deployment has passed the complete end-to-end acceptance checklist. Retained unchanged as historical evidence.
+
 # Test evidence
 
 Executed in development container: OpenJDK 21, `bash tests/run-core.sh`: 33 checks passed. See `tests/CoreChecks.java` and `docs/core-test-output.txt` for exact cases and output. Maven JUnit tests supplied, not run here. No claim of PostgreSQL, UI or deployment success.
