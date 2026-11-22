@@ -1,317 +1,139 @@
-
 <div align="center">
 
 # NEXUS
+### Your campus. In sync.
 
-### Intelligent IT Operations & Incident Management
+**A campus incident-management and operations platform.**  
+Report problems. Coordinate responses. Track resolution. Understand the bigger picture.
 
-**A unified platform for incident reporting, intelligent technician assignment, SLA monitoring, and IT service management.**
+**BITS Pilani, Hyderabad Campus · Object-Oriented Programming Course Project**
 
-Object-Oriented Programming Course Project  
-**BITS Pilani, Hyderabad Campus**
-
-**Java 21 • Spring Boot • React • PostgreSQL • Docker**
+Java 21 · Spring Boot · React · PostgreSQL · Render
 
 </div>
 
 ---
 
-## Overview
+## What is NEXUS?
 
-NEXUS is a full-stack IT incident management platform designed to streamline how technical issues are reported, assigned, tracked, and resolved.
+NEXUS brings campus support into one connected workspace. Students can report issues with a relevant building or service; technicians can take ownership of assigned work; administrators can oversee tickets, SLA deadlines, service dependencies, and campus-wide activity.
 
-Traditional IT support workflows often suffer from fragmented communication, delayed issue resolution, and limited operational visibility. NEXUS addresses these challenges through a centralized system connecting employees, technicians, and administrators.
+It is **not** a static website or a simulated dashboard: the application has a Java backend, a PostgreSQL data model, role-restricted API actions, and a React interface. Campus and service data are demonstrative, not live infrastructure telemetry.
 
-The application combines Java-based object-oriented design, automated incident workflows, role-based access control, operational analytics, and configurable administrative tools.
+> **Current repository baseline:** V6.1 Glass Operations release (20 November 2026), with subsequent landing-page and admin Incident Centre refinements (21 November 2026). Version names also appear in retained module filenames; those are implementation history, not separate deployed applications.
 
-## Key Features
+## The experience
 
-### 1. Role-Based Access Control
+| Student / employee workspace | Technician workspace | Administrator workspace |
+| --- | --- | --- |
+| Submit and track incidents, select campus locations, receive status updates, provide verification | Acknowledge and investigate assignments, request information, record private notes, resolve incidents | Monitor incidents and SLAs, manage users and policies, inspect the service graph, analytics, and audit history |
 
-NEXUS provides three dedicated user environments.
+The sign-in experience and workspaces use a **Glass Operations UI**, with an interactive campus map and a customizable **Theme Centre** (presets, accents, density, and surface styling).
 
-**Employee Portal**
-- Secure registration and login
-- Incident creation and tracking
-- Automatic priority calculation
-- Incident status and history
-- Communication with assigned technicians
-- Resolution verification and ticket closure
-- In-app notifications
+### From report to resolution
 
-**Technician Portal**
-- Assigned incident dashboard
-- Incident acknowledgment and investigation
-- Progress updates
-- Information requests and private notes
-- Incident resolution
-- Availability management
-- Workload visibility
+```mermaid
+flowchart LR
+  A["Student reports a problem"] --> B["Java priority & assignment rules"]
+  B --> C["Technician acknowledges"]
+  C --> D["Investigates / requests information"]
+  D --> E["Resolves"]
+  E --> F["Student verifies or reopens"]
+  F --> G["Closes"]
+  B --> H["SLA / audit / notifications"]
+  C --> H
+  E --> H
+```
 
-**Administrator Portal**
-- Centralized system monitoring
-- Employee and technician management
-- Service and category configuration
-- SLA policy administration
-- Assignment strategy configuration
-- Incident analytics and reporting
-- Service dependency visualization
-- Audit history and operational oversight
+### Highlights in the current code
 
-### 2. Intelligent Incident Management
+- **Smart incident reporting:** service, category, impact, urgency and campus location; preview of calculated priority and potential duplicates.
+- **Campus location support:** map and building selection; optional browser geolocation to suggest a nearby site. A pilot location check is required for resolution of certain location-tagged tickets.
+- **Intelligent assignment:** switchable skill-based and load-based technician ranking.
+- **SLA monitoring:** response and resolution deadlines, warning/breach events and P1 escalation behavior.
+- **Role-safe collaboration:** updates, technician private notes, notifications and incident audit trail.
+- **Operations command centre:** incident trends, workloads, service dependencies, topology explorer, Decision Inspector and ticket-history replay.
+- **Theme Centre:** multiple visual presets and adjustable interface settings.
+- **Optional smart report assistant:** an opt-in suggestion endpoint that falls back to local rules if external AI is disabled or unavailable. External AI needs explicit server configuration; it is **not required** for the main workflow.
 
-NEXUS supports a structured incident lifecycle:
+The service dependency graph is **illustrative and incident-derived**; it does not claim to monitor the campus network or physical assets in real time.
 
-1. An employee reports an incident.
-2. The system calculates priority using impact and urgency.
-3. An assignment strategy evaluates eligible technicians.
-4. The assigned technician acknowledges the incident.
-5. The technician investigates and resolves the issue.
-6. The employee verifies or reopens the incident.
-7. The incident is closed with an audit trail.
+## Object-oriented engineering
 
-### 3. Intelligent Technician Assignment
+NEXUS makes Java—not the browser—the authority for incident transitions, assignment and authorization.
 
-The system supports two assignment strategies:
+| OOP concept / pattern | Where to see it |
+| --- | --- |
+| **Abstraction & inheritance** | `domain/Account.java` and its `Employee`, `Technician`, `Administrator` subclasses |
+| **Encapsulation** | `domain/Incident.java` controls status transitions |
+| **Polymorphism / Strategy** | `strategy/AssignmentStrategy.java` with skill-based and load-based implementations |
+| **Observer / events** | `event/IncidentEvent.java`, `EventListeners.java` and notification channels |
+| **Repository** | Spring Data JPA interfaces in `data/` |
+| **Service-layer composition** | `service/IncidentService.java` coordinates rules, persistence and events |
+| **Algorithms** | Priority and similarity rules; dependency traversal in `domain/Rules.java` |
 
-- **Skill-Based Assignment:** Prioritizes technicians with relevant expertise.
-- **Load-Based Assignment:** Considers technician workload to distribute incidents.
+See [OOP walkthrough](TEAM_GUIDE.md), [architecture](docs/architecture.md) and [engineering decisions](DECISIONS.md).
 
-The Strategy design pattern allows administrators to select different assignment algorithms without modifying the core incident management logic.
-
-### 4. SLA Monitoring
-
-NEXUS supports configurable Service Level Agreements for incident response and resolution.
-
-Features include:
-- Priority-based SLA policies
-- Deadline tracking
-- SLA warnings
-- Breach detection
-- Escalation workflows
-- Audit records
-
-### 5. Notifications and Communication
-
-The application uses event-driven notifications to keep users informed about incident activity.
-
-- In-app notifications
-- Persistent notification history
-- Simulated email outbox
-- Optional external email integration
-- Incident communication history
-
-### 6. Operational Analytics
-
-The administrator dashboard provides tools for understanding system activity.
-
-- Incident distribution and trends
-- Technician workload analysis
-- SLA risk monitoring
-- Service dependency visualization
-- Decision Inspector
-- Audit history
-- Incident replay
-
-### 7. Service Dependency Analysis
-
-NEXUS models dependencies between IT services, helping administrators investigate related incidents and potential upstream service failures.
-
-### 8. Security
-
-- Role-based access control
-- Session-based authentication
-- CSRF protection
-- Password hashing
-- Server-side authorization
-- Protected application endpoints
-
----
-
-## Object-Oriented Programming Concepts
-
-The core application logic is implemented in Java using object-oriented principles and established design patterns.
-
-| Concept | Implementation |
-|---------|----------------|
-| Encapsulation | Incident lifecycle and business rules |
-| Abstraction | Abstract Account model |
-| Inheritance | Employee, Technician, Administrator |
-| Polymorphism | Interchangeable assignment strategies |
-| Strategy Pattern | Skill-based and load-based assignment |
-| Observer Pattern | Event-driven audit and notifications |
-| Repository Pattern | Persistence through Spring Data JPA |
-| Separation of Concerns | Domain, service, repository, and controller layers |
-
-The application emphasizes modularity, reusable components, maintainability, and separation of business logic from presentation.
-
-## Technology Stack
-
-| Layer | Technology |
-|-------|------------|
-| Backend | Java 21, Spring Boot 3.4.5 |
-| Frontend | React 18, Vite |
-| Database | PostgreSQL |
-| Persistence | Spring Data JPA |
-| Visualization | ECharts, React Flow |
-| Security | Spring Security |
-| Build Tools | Maven, npm |
-| Containerization | Docker |
-| Cloud Hosting | Render |
-
-## System Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
-    A[Employee / Technician / Administrator] --> B[React Frontend]
-    B --> C[Spring Boot REST API]
-    C --> D[Authentication and Authorization]
-    C --> E[Incident Management Service]
-    E --> F[Business Rules and Assignment Strategies]
-    E --> G[Event and Notification System]
-    E --> H[Spring Data JPA]
-    H --> I[(PostgreSQL Database)]
-    J[SLA Monitoring] --> E
+  UI["React / Vite interface"] --> API["Spring Boot REST API"]
+  API --> AUTH["Session authentication, CSRF, role checks"]
+  API --> SVC["Java services and domain rules"]
+  SVC --> STRAT["Assignment strategies"]
+  SVC --> DATA["Spring Data JPA"]
+  DATA --> DB[("PostgreSQL")]
+  SVC --> EVENTS["Incident events"]
+  EVENTS --> AUDIT["Audit history"]
+  EVENTS --> NOTICE["In-app + email outbox"]
+  SLA["SLA scheduler"] --> SVC
 ```
 
-NEXUS follows a layered architecture that separates the presentation layer, REST controllers, service logic, domain models, and persistence.
+The current Render deployment builds the React frontend **into the Spring Boot application**, then serves both through the same Docker-based web service. It is *not* deployed as a separate Vercel frontend.
 
-## Repository Structure
+## Technology
 
-```text
-NEXUS/
-├── backend/          Java Spring Boot application
-├── frontend/         React application
-├── docs/             Architecture and API documentation
-├── scripts/          Setup, build, and startup scripts
-├── tests/            Java core tests
-├── Dockerfile        Container deployment
-├── render.yaml       Render deployment configuration
-└── README.md
-```
+**Backend:** Java 21, Spring Boot 3.4.5, Spring Security, JPA, Maven  
+**Frontend:** React 18, Vite 6, ECharts, React Flow, Leaflet / OpenStreetMap  
+**Database:** PostgreSQL  
+**Infrastructure:** Docker, Render  
+**Optional integrations:** restricted email delivery via Resend; opt-in AI assistance via Groq configuration
 
----
+## Live deployment
 
-## Getting Started
+NEXUS has been deployed to Render as a combined application. The repository does not currently record a verified public app URL; use the URL supplied with the course submission rather than a guessed link.
 
-### Prerequisites
+**Availability note:** Render's free service may spin down after inactivity. An external HTTP monitor can reduce inactivity-related cold starts, but cannot guarantee continuous availability. The server exposes `/health` for readiness checks.
 
-- Java 21
-- Maven
-- Node.js and npm
-- PostgreSQL database
-- Git
+## Evidence and scope
 
-### Clone the Repository
+- The repository contains JUnit and standalone Java checks. The [recorded core-test evidence](TEST_RESULTS.md) is from an earlier implementation snapshot; it must not be mistaken for full V6.1 end-to-end certification.
+- Features listed here are **code-backed**, not a claim that every production workflow has passed a fresh browser test.
+- Demo incidents and campus topology are illustrative. Historical replay reconstructs recorded ticket states, not a complete campus-wide time machine.
+- NEXUS is an academic prototype, not a production-hardened campus IT deployment.
 
-```bash
-git clone https://github.com/anantagarwal0156H/NEXUS.git
-cd NEXUS
-```
+## Explore the repository
 
-### Configure the Application
+| Read | Purpose |
+| --- | --- |
+| [Current implementation overview](STATUS.md) | Version baseline and verified vs. unverified claims |
+| [Architecture](docs/architecture.md) | Layers, classes and flow |
+| [Walkthrough](docs/DEMO.md) | Student → technician → admin scenario |
+| [OOP guide](TEAM_GUIDE.md) | Code landmarks for the viva |
+| [API reference](docs/API.md) | API routes and authorization |
+| [Feature coverage](RUBRIC_COVERAGE.md) | Requirements mapped to source |
+| [Test evidence](TEST_RESULTS.md) | What was actually tested |
+| [Engineering decisions](DECISIONS.md) | Design tradeoffs |
 
-```bash
-bash scripts/configure.sh
-```
-
-Provide the required database connection details when prompted.
-
-Use a dedicated database and keep credentials private.
-
-### Build the Application
-
-```bash
-bash scripts/build.sh
-```
-
-### Start NEXUS
-
-```bash
-bash scripts/start.sh
-```
-
-The application will be available at:
-
-http://localhost:8080
-
-Health check:
-
-http://localhost:8080/health
-
-### Frontend Development
-
-With the backend running:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
----
-
-## Cloud Deployment
-
-NEXUS uses a Docker-based deployment on Render.
-
-The frontend is built into the Spring Boot application's static resources, allowing the combined application to be served through a single deployment.
-
-### Deployment Optimization
-
-Render's free-tier infrastructure may suspend inactive services, introducing cold-start delays.
-
-To mitigate this limitation, an external monitoring service such as UptimeRobot can periodically request the application health endpoint.
-
-A 10-minute monitoring interval can help prevent inactivity-based shutdowns, although availability remains subject to hosting limitations and free-tier resource allowances.
-
-This approach helps improve responsiveness without modifying the application's core business logic.
-
----
-
-## Testing and Validation
-
-The repository includes:
-
-- Java business-rule tests
-- Incident lifecycle validation
-- Assignment algorithm checks
-- Priority calculation checks
-- SLA calculation checks
-- API and role-based workflow test scenarios
-
-The initial recorded core test run contains **33 passing Java checks**. Additional end-to-end tests must be verified against the current deployment.
-
-See [TEST_RESULTS.md](TEST_RESULTS.md) for test evidence and outstanding verification requirements.
-
-## Documentation
-
-- [System Architecture](docs/architecture.md)
-- [API Documentation](docs/API.md)
-- [Demonstration Guide](docs/DEMO.md)
-- [OOP Implementation Guide](TEAM_GUIDE.md)
-- [Requirements Coverage](RUBRIC_COVERAGE.md)
-- [Test Results](TEST_RESULTS.md)
-
-## Project Scope
-
-NEXUS is an academic prototype demonstrating full-stack application development, object-oriented software design, database persistence, role-based workflows, and cloud deployment.
-
-The system uses application-generated incident records rather than live infrastructure monitoring.
-
-Production-scale deployment would require further security hardening, scalability testing, and infrastructure optimization.
+*Developer run scripts remain in `scripts/` for maintainers; this README is intentionally a project showcase rather than a localhost installation tutorial.*
 
 ---
 
 <div align="center">
 
-### NEXUS
+**NEXUS — Report. Route. Resolve.**
 
-**From Incident Reporting to Accountable Resolution**
-
-*Object-Oriented Programming Course Project*
-
-**BITS Pilani, Hyderabad Campus**
+Built for the Object-Oriented Programming course at **BITS Pilani, Hyderabad Campus**.
 
 </div>
-
