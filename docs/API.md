@@ -1,7 +1,31 @@
-# API overview
+# NEXUS V6.1 — API map
 
-Same-origin JSON and session cookie. GET /api/auth/csrf yields token/header; send that header on every write. POST /api/auth/register {name,email,password}; POST /api/auth/login {email,password}; GET /api/auth/me; POST /api/auth/logout. Public registration always EMPLOYEE.
+**Base:** same-origin `/api` using a session cookie. Obtain CSRF token/header via `GET /api/auth/csrf`; include it on state-changing requests. Server-side role/ownership checks apply.
 
-GET /api/catalog; GET /api/incidents?q=&status=&priority=&category=&service=&technician=&sla=&from=&to=; POST /api/incidents/preview and POST /api/incidents {title,description,serviceId,categoryId,impact,urgency}; GET /api/incidents/{id}; POST /api/incidents/{id}/{action} with optional {text,rating,technicianId,relatedId}. Actions: acknowledge, start, resolve, verify, close, reopen, note, request-info, private-note, assign, link. Role/ownership enforced server-side. GET /api/reports, /api/notifications; POST /api/notifications/{id}/read; POST /api/availability {available}.
+| Area | Example endpoints | Authorization |
+| --- | --- | --- |
+| Authentication | `GET /auth/csrf`, `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `POST /auth/logout` | Login/register public; account-specific endpoints require session as appropriate |
+| Catalog | `GET /catalog` | Authenticated |
+| Reporting | `POST /incidents/preview`, `POST /incidents`, `GET /incidents`, `GET /incidents/{id}` | Employee creation, role-scoped visibility |
+| Lifecycle | `POST /incidents/{id}/{action}` | Authorized actor based on action and ticket |
+| Location verification | See `IncidentController` location-check method and resolution validation | Assigned technician where required |
+| Smart assistance | `POST /ai/report` | Employee; opt-in consent and input limits; rules fallback |
+| Notifications | `GET /notifications`, `POST /notifications/{id}/read` | Recipient only |
+| Technician | `POST /availability` | Technician |
+| Reporting | `GET /reports` | Role-scoped |
+| Administration | `GET/POST /admin/users`, `PUT /admin/users/{id}`; `POST /admin/categories`; `GET/POST/PUT /admin/services...` | Administrator |
+| SLA & assignment | `GET/PUT /admin/policies`, `GET/PUT /admin/strategy`, `GET /admin/decision/{id}` | Administrator |
+| Operations | `GET /admin/graph`, `GET /admin/audit`, `GET /admin/outbox`, `GET /admin/activity` | Administrator |
+| Campus topology | `POST /admin/topology-v6` | Administrator |
 
-Admin only: GET/POST /api/admin/users; PUT /api/admin/users/{id}; POST /api/admin/categories; POST /api/admin/services; PUT /api/admin/services/{id}; GET/PUT /api/admin/policies; GET/PUT /api/admin/strategy; GET /api/admin/decision/{id}?strategy=SKILL; GET /api/admin/graph, /api/admin/audit, /api/admin/outbox. See DTO records in controllers for exact request fields. Errors: 400 validation/transition, 401 unauthenticated/invalid login, 403 forbidden, 404 missing, 409 conflicting data.
+The incident action endpoint supports `acknowledge`, `start`, `resolve`, `verify`, `close`, `reopen`, `note`, `request-info`, `private-note`, `assign`, and `link`, subject to action-specific role and state restrictions.
+
+## Reporting fields
+
+The current incident submission accepts title, description, service/category identifiers, impact, urgency, and optional `locationCode` / `locationNote` fields. The location catalogue comes from `GET /catalog`. Client-side geolocation is a suggestion feature, not a substitute for server validation.
+
+## Error handling
+
+Common responses: `400` invalid request/transition, `401` unauthenticated, `403` forbidden, `404` missing resource, `409` conflict. Inspect controller DTOs and source for exact payloads rather than treating this overview as a generated OpenAPI schema.
+
+See [architecture](architecture.md) and [current status](../STATUS.md).

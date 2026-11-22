@@ -1,9 +1,39 @@
-# Status — first source iteration
+# NEXUS — current implementation status
 
-Implemented in source: Spring Boot API with persistent entities and JPA repositories; login/register/session/CSRF/RBAC; employee, technician and admin React workspaces; guarded incident lifecycle; priority and two assignment strategies; SLA job and persistent warning/breach flags; event-driven audit and notification channels; simulated outbox and optional restricted Resend worker; category/service/user/SLA/strategy configuration; scoped search and reports; service graph and suspected dependency correlations; ECharts analytics; Decision Inspector; historical ticket-state replay.
+**Documentation baseline:** 22 November 2026. This page describes source on `main`, not an independent live-production audit.
 
-Verified: `bash tests/run-core.sh` executed on OpenJDK 21 and returned 33 PASS checks. No Maven binary/dependencies or frontend dependencies were available in the generation environment, so the framework compilation, database connection, browser and deployment are NOT verified. Run build/start locally and report errors with secrets removed. JUnit is included but not executed here.
+## Version provenance
 
-Incomplete/limitations: historical replay is ticket-state reconstruction from audit only, not a graph of historical service states; no isolated outage simulation; no full public production security hardening or external email confirmation; reports are application records, not real telemetry. Sample incidents are created by users via the demo walkthrough, not pre-populated. Existing schema uses Hibernate auto-update instead of versioned migrations. Admin config supports adding categories, editing users/services/policies and changing strategy; no destructive delete UI. Priority is calculated on creation; no audited priority-edit action yet. Duplicate suggestions for ordinary users are confined to already visible tickets for privacy. Real test email routes to one permitted recipient. No lockfile generated in this environment; npm install creates one. Actual API and browser validation remains essential before submission.
+- **20 Nov 2026:** commit `81e886e` — **NEXUS V6.1 – Glass Operations Release**.
+- **21 Nov 2026:** `d6b37e8` — landing-page overlap fix.
+- **21 Nov 2026:** `a8ee600` — separate admin Incident Centre from SLA Monitor.
+- **22 Nov 2026:** README-only changes. No later application-code release was found in the inspected history.
 
-Blockers: B01 local Maven/npm dependencies; B02 Neon credentials/connection supplied privately by user; B03 GitHub/Render deployment approval/authentication; B04 Resend credentials and authorized sender/recipient. No credentials or public pushes performed.
+Thus the latest recognizable *named* release is **V6.1**, with post-release refinements. No GitHub Release/tag establishes a different version number.
+
+## Present in current source
+
+- Spring Boot API, JPA PostgreSQL model, session authentication, CSRF, and role-scoped access.
+- Student/employee, technician, and administrator workspaces; campus-oriented login and glass-style theme centre.
+- Incident creation, classification, priority, skill/load assignment, lifecycle, communications and audit.
+- Campus location picker and Leaflet map with OpenStreetMap tiles; GPS suggestions and restricted pilot location verification for selected resolution actions.
+- SLA processing, admin configuration, warnings/breaches, dashboard analytics, Incident Centre, topology explorer and assignment Decision Inspector.
+- Persistent in-app notifications and simulated email outbox; optional restricted external email integration.
+- Optional smart-report endpoint with local rule fallback when Groq is disabled or unavailable.
+
+## Evidence: distinguish implementation from validation
+
+The historical `TEST_RESULTS.md` documents **33 standalone Java checks passing in an earlier environment**. That report did not verify V6.1 as deployed, so a fresh build and end-to-end regression pass should be recorded before claiming certification.
+
+The user reports a live Render deployment; this repository alone does not expose a verified live URL, uptime measurements, monitoring-provider configuration, or complete hosted-test logs.
+
+## Known limitations / intentional boundaries
+
+- Illustrative topology and campus reports are **not** live device/network telemetry.
+- Ticket replay is based on audit history, not a full historical graph reconstruction.
+- Geolocation is optional for reporting; verification is only applied to location-identified resolution flows and depends on reference site coordinates and device accuracy.
+- Optional AI depends on separate private environment configuration and consent; local rules remain the fallback.
+- Free-tier hosting can cold-start; external requests do not guarantee uptime.
+- Database schema currently relies on Hibernate updating tables rather than versioned migrations. Production security, load tests, and data-retention policies need further work.
+
+See [README](README.md), [feature coverage](RUBRIC_COVERAGE.md), [test evidence](TEST_RESULTS.md), and [architecture](docs/architecture.md).

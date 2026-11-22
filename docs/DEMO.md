@@ -1,7 +1,44 @@
-# Demo (15–20 minutes, all four members)
+# NEXUS V6.1 — Live demonstration flow
 
-1. Employee logs in, opens Report Incident, chooses Payment gateway / APPLICATION, enters a title and description, impact 3 and urgency 3. Preview P1, submit, note incident ID and assigned technician. Open notifications and timeline.
-2. Log in as assigned technician (default first skill strategy normally Alex Morgan / tech@nexus.demo). Open assigned incident, acknowledge, start, request information/add private note, resolve with actual resolution text. Employee logs in, replies if requested, verifies/rates and closes. Confirm private note is absent in employee view. Try invalid role via direct API in testing (not merely hidden button).
-3. Employee reports two closely worded incidents for same service/category; inspect duplicate warning; admin links related records. Report another service depending on common provider. Admin explores topology, suspected causes, Decision Inspector, Sankey, heatmap, workload and SLA risk. To test escalation, admin changes default P1 response to 1 minute (resolution >= response) before creating a new P1; leave it unacknowledged while app stays running; verify breach/escalation once in audit and both notification channels. Restore policy afterward. Replay actual audit events in Time Machine; clearly explain v1 limitations.
+**Audience:** OOP course evaluators. This is a guided scenario; do not claim a step was independently tested until actually demonstrated.
 
-Suggested presenters: employee journey/research; Java lifecycle and Strategy; Java SLA/Observer/database; administrator visualization/QA and limitations. Do not claim passing tests or deployment that haven't been verified.
+## 1. Opening and context
+
+Show the campus-themed login and explain that the React interface talks to a Java Spring Boot API with PostgreSQL persistence. Briefly show Theme Centre presets if time permits.
+
+## 2. Student / employee: create a report
+
+1. Log in with a configured demo employee account (credentials provided privately).
+2. Open reporting. Choose a service/category, impact, urgency and optional building/location details.
+3. Explain how Java computes priority and previews related incidents.
+4. Submit and record the incident ID, status and any technician assignment.
+5. Open incident detail, notifications and the audit timeline. Emphasize the user's visibility is role-scoped.
+6. If demonstrating smart assistance, explicitly identify it as **optional**, permission-based and able to fall back to local rules.
+
+## 3. Technician: take ownership
+
+1. Sign in as the assigned technician.
+2. Open the assigned queue, acknowledge and start work.
+3. Add a visible update or request information; contrast with a private technician note.
+4. Resolve with a meaningful explanation. For location-tagged tickets requiring pilot site verification, use the application's legitimate location workflow; do not fake GPS readings.
+5. Return to the student to verify and close, or explain the supported reopen path.
+
+## 4. Administrator: operations and control
+
+1. Open the administrator overview, Incident Centre and SLA Monitor as **separate workspaces**.
+2. Show workload and incident trends, service graph/topology, and Decision Inspector.
+3. Explain the distinction between saved service links, illustrative proposed campus links, and incident-derived associations.
+4. Inspect audit entries and notifications.
+5. Show administration of users, services/categories, policies, and assignment strategy. Avoid modifying important production data solely for the demo.
+6. Explain that optional external email is distinct from the persistent simulated outbox.
+
+## 5. Conclude with OOP
+
+Point to `Account` inheritance, `Incident` state handling, `AssignmentStrategy` polymorphism, and the event listeners used for notifications/audit.
+
+## Demonstration safeguards
+
+- Use demo/test accounts and disposable incidents.
+- Capture the current deployment URL and status before presenting; Render free services can cold-start.
+- Don't imply NEXUS receives live campus network alerts, that AI is always enabled, or that all tests have recently passed.
+- Source reference: [current status](../STATUS.md) and [viva code map](../TEAM_GUIDE.md).
