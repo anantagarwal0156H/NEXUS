@@ -1,23 +1,317 @@
-# NEXUS / Intelligent IT Operations
 
-Java-first incident-management website for CS F213 / MAC F212. React + Vite, Spring Boot 3.4.5, Java 21, JPA, PostgreSQL, ECharts, React Flow. All dependencies are free/open source; no paid API required. This is an implementation candidate, not a verified cloud deployment. See STATUS.md.
+<div align="center">
 
-## macOS local launch (recommended first)
+# NEXUS
 
-1. Install Java 21, Maven and Node: `brew install openjdk@21 maven node`.
-2. Extract the ZIP, open Terminal and `cd` into the NEXUS folder. Run `bash scripts/configure.sh`. In https://console.neon.tech/ open your existing project, select the production branch and Connect, choose direct (non-pooled) connection. Supply host, database name, role and password separately. Only use an empty/dedicated database with permission to create tables. Hibernate creates/updates tables on startup; do not point at a valuable database. The script stores secrets in a permission-restricted `.env` excluded from Git. Do not share it.
-3. `bash scripts/build.sh` downloads frontend/Maven dependencies, builds the frontend into Spring Boot static resources, compiles backend and runs JUnit tests. `bash tests/run-core.sh` independently runs plain Java checks (set JAVA_HOME/PATH to Java 21 if necessary).
-4. `bash scripts/start.sh` starts the combined site at http://localhost:8080. Open http://localhost:8080/health to check process readiness. Keep Terminal open; Ctrl+C stops it. Data stays in PostgreSQL.
-5. Demo logins (all use the unique password entered in configure.sh): employee@nexus.demo, employee2@nexus.demo, tech@nexus.demo, tech2@nexus.demo, admin@nexus.demo. Seed creates these accounts, fictional services/categories and SLA settings. Report incidents to populate the charts. Existing account passwords are not reset by changing DEMO_PASSWORD.
+### Intelligent IT Operations & Incident Management
 
-For frontend development only, `cd frontend && npm run dev` with the backend already running on port 8080. Vite proxies API calls. For normal startup, use the combined site.
+**A unified platform for incident reporting, intelligent technician assignment, SLA monitoring, and IT service management.**
 
-## Cloud deployment (after local verification)
+Object-Oriented Programming Course Project  
+**BITS Pilani, Hyderabad Campus**
 
-Keep `.env` out of Git. Put these files at the root of your existing GitHub repository, commit after reviewing, and push. At https://dashboard.render.com/ create a Web Service linked to that repo, Docker runtime, free instance, root Dockerfile, health path `/health`. Add DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD through Environment (copy values, not shell `export`), COOKIE_SECURE=true, EMAIL_ENABLED=false. Use a dedicated empty database with NEXUS_DEMO=false and a strong ADMIN_PASSWORD to create admin@nexus.local; add technicians via the admin portal. For a separate fictional demo database only, set NEXUS_DEMO=true plus a unique DEMO_PASSWORD and do not distribute administrator credentials publicly. Public employee registration remains enabled; this is a class demo, not production-hardened. Free hosting may sleep and SLA background processing cannot run while asleep; deadlines use persisted timestamps and catch up when the service starts. Confirm free tier before provisioning; no billing or paid domain.
+**Java 21 • Spring Boot • React • PostgreSQL • Docker**
 
-## Email
+</div>
 
-Default: simulated persistent outbox + in-app notifications. Optional real test delivery: set EMAIL_ENABLED=true, RESEND_API_KEY, EMAIL_FROM and EMAIL_TEST_RECIPIENT privately in `.env` or Render environment. Restart. Use only your own allowed test recipient (Resend may restrict onboarding@resend.dev). This version routes all external messages to that one configured test address; does not send to demo account addresses. SENT means provider HTTP acceptance, not inbox delivery. No live email was tested here.
+---
 
-See docs/DEMO.md, docs/requirements-matrix.md, docs/API.md, docs/architecture.md, TEAM_GUIDE.md and TEST_RESULTS.md. Keep secrets out of screenshots and logs.
+## Overview
+
+NEXUS is a full-stack IT incident management platform designed to streamline how technical issues are reported, assigned, tracked, and resolved.
+
+Traditional IT support workflows often suffer from fragmented communication, delayed issue resolution, and limited operational visibility. NEXUS addresses these challenges through a centralized system connecting employees, technicians, and administrators.
+
+The application combines Java-based object-oriented design, automated incident workflows, role-based access control, operational analytics, and configurable administrative tools.
+
+## Key Features
+
+### 1. Role-Based Access Control
+
+NEXUS provides three dedicated user environments.
+
+**Employee Portal**
+- Secure registration and login
+- Incident creation and tracking
+- Automatic priority calculation
+- Incident status and history
+- Communication with assigned technicians
+- Resolution verification and ticket closure
+- In-app notifications
+
+**Technician Portal**
+- Assigned incident dashboard
+- Incident acknowledgment and investigation
+- Progress updates
+- Information requests and private notes
+- Incident resolution
+- Availability management
+- Workload visibility
+
+**Administrator Portal**
+- Centralized system monitoring
+- Employee and technician management
+- Service and category configuration
+- SLA policy administration
+- Assignment strategy configuration
+- Incident analytics and reporting
+- Service dependency visualization
+- Audit history and operational oversight
+
+### 2. Intelligent Incident Management
+
+NEXUS supports a structured incident lifecycle:
+
+1. An employee reports an incident.
+2. The system calculates priority using impact and urgency.
+3. An assignment strategy evaluates eligible technicians.
+4. The assigned technician acknowledges the incident.
+5. The technician investigates and resolves the issue.
+6. The employee verifies or reopens the incident.
+7. The incident is closed with an audit trail.
+
+### 3. Intelligent Technician Assignment
+
+The system supports two assignment strategies:
+
+- **Skill-Based Assignment:** Prioritizes technicians with relevant expertise.
+- **Load-Based Assignment:** Considers technician workload to distribute incidents.
+
+The Strategy design pattern allows administrators to select different assignment algorithms without modifying the core incident management logic.
+
+### 4. SLA Monitoring
+
+NEXUS supports configurable Service Level Agreements for incident response and resolution.
+
+Features include:
+- Priority-based SLA policies
+- Deadline tracking
+- SLA warnings
+- Breach detection
+- Escalation workflows
+- Audit records
+
+### 5. Notifications and Communication
+
+The application uses event-driven notifications to keep users informed about incident activity.
+
+- In-app notifications
+- Persistent notification history
+- Simulated email outbox
+- Optional external email integration
+- Incident communication history
+
+### 6. Operational Analytics
+
+The administrator dashboard provides tools for understanding system activity.
+
+- Incident distribution and trends
+- Technician workload analysis
+- SLA risk monitoring
+- Service dependency visualization
+- Decision Inspector
+- Audit history
+- Incident replay
+
+### 7. Service Dependency Analysis
+
+NEXUS models dependencies between IT services, helping administrators investigate related incidents and potential upstream service failures.
+
+### 8. Security
+
+- Role-based access control
+- Session-based authentication
+- CSRF protection
+- Password hashing
+- Server-side authorization
+- Protected application endpoints
+
+---
+
+## Object-Oriented Programming Concepts
+
+The core application logic is implemented in Java using object-oriented principles and established design patterns.
+
+| Concept | Implementation |
+|---------|----------------|
+| Encapsulation | Incident lifecycle and business rules |
+| Abstraction | Abstract Account model |
+| Inheritance | Employee, Technician, Administrator |
+| Polymorphism | Interchangeable assignment strategies |
+| Strategy Pattern | Skill-based and load-based assignment |
+| Observer Pattern | Event-driven audit and notifications |
+| Repository Pattern | Persistence through Spring Data JPA |
+| Separation of Concerns | Domain, service, repository, and controller layers |
+
+The application emphasizes modularity, reusable components, maintainability, and separation of business logic from presentation.
+
+## Technology Stack
+
+| Layer | Technology |
+|-------|------------|
+| Backend | Java 21, Spring Boot 3.4.5 |
+| Frontend | React 18, Vite |
+| Database | PostgreSQL |
+| Persistence | Spring Data JPA |
+| Visualization | ECharts, React Flow |
+| Security | Spring Security |
+| Build Tools | Maven, npm |
+| Containerization | Docker |
+| Cloud Hosting | Render |
+
+## System Architecture
+
+```mermaid
+flowchart TD
+    A[Employee / Technician / Administrator] --> B[React Frontend]
+    B --> C[Spring Boot REST API]
+    C --> D[Authentication and Authorization]
+    C --> E[Incident Management Service]
+    E --> F[Business Rules and Assignment Strategies]
+    E --> G[Event and Notification System]
+    E --> H[Spring Data JPA]
+    H --> I[(PostgreSQL Database)]
+    J[SLA Monitoring] --> E
+```
+
+NEXUS follows a layered architecture that separates the presentation layer, REST controllers, service logic, domain models, and persistence.
+
+## Repository Structure
+
+```text
+NEXUS/
+├── backend/          Java Spring Boot application
+├── frontend/         React application
+├── docs/             Architecture and API documentation
+├── scripts/          Setup, build, and startup scripts
+├── tests/            Java core tests
+├── Dockerfile        Container deployment
+├── render.yaml       Render deployment configuration
+└── README.md
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Java 21
+- Maven
+- Node.js and npm
+- PostgreSQL database
+- Git
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/anantagarwal0156H/NEXUS.git
+cd NEXUS
+```
+
+### Configure the Application
+
+```bash
+bash scripts/configure.sh
+```
+
+Provide the required database connection details when prompted.
+
+Use a dedicated database and keep credentials private.
+
+### Build the Application
+
+```bash
+bash scripts/build.sh
+```
+
+### Start NEXUS
+
+```bash
+bash scripts/start.sh
+```
+
+The application will be available at:
+
+http://localhost:8080
+
+Health check:
+
+http://localhost:8080/health
+
+### Frontend Development
+
+With the backend running:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## Cloud Deployment
+
+NEXUS uses a Docker-based deployment on Render.
+
+The frontend is built into the Spring Boot application's static resources, allowing the combined application to be served through a single deployment.
+
+### Deployment Optimization
+
+Render's free-tier infrastructure may suspend inactive services, introducing cold-start delays.
+
+To mitigate this limitation, an external monitoring service such as UptimeRobot can periodically request the application health endpoint.
+
+A 10-minute monitoring interval can help prevent inactivity-based shutdowns, although availability remains subject to hosting limitations and free-tier resource allowances.
+
+This approach helps improve responsiveness without modifying the application's core business logic.
+
+---
+
+## Testing and Validation
+
+The repository includes:
+
+- Java business-rule tests
+- Incident lifecycle validation
+- Assignment algorithm checks
+- Priority calculation checks
+- SLA calculation checks
+- API and role-based workflow test scenarios
+
+The initial recorded core test run contains **33 passing Java checks**. Additional end-to-end tests must be verified against the current deployment.
+
+See [TEST_RESULTS.md](TEST_RESULTS.md) for test evidence and outstanding verification requirements.
+
+## Documentation
+
+- [System Architecture](docs/architecture.md)
+- [API Documentation](docs/API.md)
+- [Demonstration Guide](docs/DEMO.md)
+- [OOP Implementation Guide](TEAM_GUIDE.md)
+- [Requirements Coverage](RUBRIC_COVERAGE.md)
+- [Test Results](TEST_RESULTS.md)
+
+## Project Scope
+
+NEXUS is an academic prototype demonstrating full-stack application development, object-oriented software design, database persistence, role-based workflows, and cloud deployment.
+
+The system uses application-generated incident records rather than live infrastructure monitoring.
+
+Production-scale deployment would require further security hardening, scalability testing, and infrastructure optimization.
+
+---
+
+<div align="center">
+
+### NEXUS
+
+**From Incident Reporting to Accountable Resolution**
+
+*Object-Oriented Programming Course Project*
+
+**BITS Pilani, Hyderabad Campus**
+
+</div>
+
