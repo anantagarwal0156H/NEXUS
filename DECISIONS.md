@@ -9,3 +9,11 @@
 - Graph provider -> dependent; visited set BFS supports cycles; suspected root cause means coverage of at least two recently reported services, not verified outage or telemetry.
 - PostgreSQL relational model; demo and production credentials kept in environment; secure-cookie mode for HTTPS. Basic session security and API authorization, not production certification.
 - Hibernate auto-update chosen for time-limited initial build; migrate to Flyway, paging, stronger rate limits, secret rotation, deployment monitoring and integration tests before real operations.
+
+## V6.1 implementation notes
+
+- The current React UI includes a campus-facing Glass Operations login and configurable Theme Centre; these styling concerns do not own business rules.
+- Location selection is assisted by browser geolocation only with a user action; server-side `GeoCheck` uses a designated pilot site radius and accuracy limits for selected resolution paths. The campus map is illustrative, not a live tracking product.
+- An optional AI reporting endpoint uses explicit consent, conservative text checks, rate limits and a fallback to deterministic category suggestions. External AI is not required for regular reporting.
+- The campus topology includes illustrative provider-to-dependent relationships that may be proposed separately from stored edges. It is not verified physical infrastructure data.
+- Retained filenames such as `v2.jsx` and `command-v4.jsx` are still imported into the current frontend; version names are historical module labels and are not reasons to delete source files.
